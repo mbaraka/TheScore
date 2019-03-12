@@ -13,8 +13,8 @@ interface TeamDao {
     fun getAll(): List<Team>
 
     @Insert
-    fun insertAll(cities: List<Team>)
+    fun insertAll(data: List<Team>)
 
     @Delete
-    fun delete(user: Team)
+    fun delete(data: Team)
 }

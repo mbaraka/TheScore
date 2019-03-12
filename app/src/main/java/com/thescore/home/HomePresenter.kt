@@ -24,7 +24,7 @@ class HomePresenter @Inject constructor(private val requestHelper: RequestHelper
 
     private val requestDisposable = SerialDisposable()
 
-    fun loadSaveCities() {
+    fun loadData() {
         requestDisposable.set(Observable.merge(loadFromDB(), requestData())
                 .compose(RxHelper.asyncToUiObservable())
                 .subscribe({
@@ -35,7 +35,7 @@ class HomePresenter @Inject constructor(private val requestHelper: RequestHelper
                 }))
     }
 
-    fun listenToCities(): Observable<List<Team>> {
+    fun listenToData(): Observable<List<Team>> {
         return dataEmitter.observeOn(AndroidSchedulers.mainThread())
     }
 

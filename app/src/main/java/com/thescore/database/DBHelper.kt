@@ -9,9 +9,7 @@ object DBHelper {
         private set
 
     fun start(context: Context) {
-        database = Room.databaseBuilder(
-            context,
-            AppDatabase::class.java, context.getString(R.string.app_name)
-        ).build()
+        database = Room.databaseBuilder(context, AppDatabase::class.java, context.getString(R.string.app_name))
+            .build()
     }
 }

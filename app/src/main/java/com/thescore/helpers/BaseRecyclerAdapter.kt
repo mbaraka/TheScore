@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BaseAdapter<T>(private val viewHolderClicked: ViewHolderClicked<T>) : RecyclerView.Adapter<MyViewHolder>() {
+abstract class BaseRecyclerAdapter<T>(private val viewHolderClicked: ViewHolderClicked<T>?) : RecyclerView.Adapter<MyViewHolder>() {
 
     protected val dataList: ArrayList<T> = ArrayList()
 
@@ -19,9 +19,13 @@ abstract class BaseAdapter<T>(private val viewHolderClicked: ViewHolderClicked<T
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         fillViewData(holder, position)
-        holder.view.setOnClickListener {
-            viewHolderClicked.onItemViewClicked(holder.view, dataList[position])
+
+        viewHolderClicked?.let {
+            holder.view.setOnClickListener {
+                viewHolderClicked.onItemViewClicked(holder.view, dataList[position])
+            }
         }
+
     }
 
     abstract fun fillViewData(holder: MyViewHolder, position: Int)

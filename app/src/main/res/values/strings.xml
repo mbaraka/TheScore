@@ -3,4 +3,9 @@
     <string name="teamName">Team name: %s</string>
     <string name="wins">Wins: %d</string>
     <string name="losses">Loses: %d</string>
+    <string name="firstName">First Name: %s</string>
+    <string name="lastName">Last Name: %s</string>
+    <string name="position">Position: %s</string>
+    <string name="number">Number: %d</string>
+    <string name="home">Teams List</string>
 </resources>

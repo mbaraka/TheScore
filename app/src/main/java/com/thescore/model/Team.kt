@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.thescore.database.DataTypeConverter
+import java.io.Serializable
 
 @Entity(tableName = "Team")
 data class Team(
@@ -13,4 +14,4 @@ data class Team(
         val losses: Int,
         @TypeConverters(DataTypeConverter::class) val players: List<Player>,
         val wins: Int
-)
+) : Serializable

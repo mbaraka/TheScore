@@ -26,20 +26,6 @@ class DataTypeConverter {
         fun playerListToString(someObjects: MutableList<Player>): String {
             return gson.toJson(someObjects)
         }
-
-//        //
-//        @TypeConverter
-//        @JvmStatic
-//        fun toCoord(data: String?): Coord {
-//            val listType = object : TypeToken<Coord>() {}.type
-//            return gson.fromJson<Coord>(data, listType)
-//        }
-//
-//        @TypeConverter
-//        @JvmStatic
-//        fun fromCoord(someObjects: Coord): String {
-//            return gson.toJson(someObjects)
-//        }
     }
 
 }

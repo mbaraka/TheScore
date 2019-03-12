@@ -1,6 +1,7 @@
 package com.thescore.home
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,20 +11,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.thescore.Application
-import com.thescore.helpers.BaseAdapter
+import com.thescore.helpers.BaseRecyclerAdapter
 import com.thescore.R
 import com.thescore.helpers.ViewHolderClicked
 import com.thescore.model.Team
 import com.thescore.utils.rxError
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 import com.thescore.com.thescore.model.SortType
+import com.thescore.teamActivity.TeamActivity
+import kotlinx.android.synthetic.main.activity_team.*
 
 class MainActivity : AppCompatActivity(), ViewHolderClicked<Team> {
 
-    private lateinit var baseAdapter: BaseAdapter<Team>
+    private lateinit var baseRecyclerAdapter: BaseRecyclerAdapter<Team>
     @Inject lateinit var homePresenter: HomePresenter
     private val dataDisposable = SerialDisposable()
     private val errorDisposable = SerialDisposable()
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), ViewHolderClicked<Team> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Application.appComponent.inject(this)
+        title = getString(R.string.home)
 
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.setHasFixedSize(true)
@@ -40,22 +43,24 @@ class MainActivity : AppCompatActivity(), ViewHolderClicked<Team> {
 
         recycler.addItemDecoration(dividerItemDecoration)
 
-        baseAdapter = TeamAdapter(this)
-        recycler.adapter = baseAdapter
+        baseRecyclerAdapter = TeamRecyclerAdapter(this)
+        recycler.adapter = baseRecyclerAdapter
 
         listenToEvents()
-        homePresenter.loadSaveCities()
+        homePresenter.loadData()
     }
 
     override fun onItemViewClicked(view: View, item: Team) {
-
+        val intent = Intent(this, TeamActivity::class.java)
+        intent.putExtra(TeamActivity.EXTRA_TEAM_KEY, item)
+        startActivity(intent)
     }
 
     @SuppressLint("CheckResult")
     private fun listenToEvents() {
-        dataDisposable.set(homePresenter.listenToCities()
+        dataDisposable.set(homePresenter.listenToData()
                 .subscribe(Consumer {
-                    baseAdapter.setData(it)
+                    baseRecyclerAdapter.setData(it)
                 }, rxError("Failed to listen to data changes"))
         )
 
