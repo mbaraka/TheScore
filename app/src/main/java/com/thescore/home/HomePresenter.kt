@@ -109,7 +109,7 @@ class HomePresenter @Inject constructor(private val requestHelper: RequestHelper
 
         private val Losses_Sort = object : Comparator<Team> {
             override fun compare(first: Team, second: Team): Int {
-                return first.losses.compareTo(second.losses)
+                return second.losses.compareTo(first.losses)
             }
         }
     }
