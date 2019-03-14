@@ -2,6 +2,7 @@ package com.thescore.dagger;
 
 import android.content.Context;
 
+import com.thescore.database.DBHelper;
 import com.thescore.utils.RequestHelper;
 
 import java.lang.annotation.Retention;
@@ -32,6 +33,12 @@ public class AppContextModule {
     @Provides
     RequestHelper provideRequestHelper() {
         return new RequestHelper();
+    }
+
+    @Provides
+    @Singleton
+    DBHelper provideDbHelper() {
+        return new DBHelper(appContext);
     }
 
     @Retention(RetentionPolicy.RUNTIME)

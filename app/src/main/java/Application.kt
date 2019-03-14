@@ -15,7 +15,6 @@ class Application : Application() {
 
     private fun init(){
         appComponent = DaggerAppComponent.builder().appContextModule(AppContextModule(applicationContext)).build()
-        DBHelper.start(this)
     }
 
     fun getAppComponent(): AppComponent {

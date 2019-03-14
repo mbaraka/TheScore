@@ -5,6 +5,7 @@ import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.thescore.com.thescore.model.SortType
+import com.thescore.database.AppDatabase
 import com.thescore.database.DBHelper
 import com.thescore.model.Team
 import com.thescore.utils.*
@@ -13,11 +14,15 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import io.reactivex.subjects.PublishSubject
+import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class HomePresenter @Inject constructor(private val requestHelper: RequestHelper) {
+class HomePresenter @Inject constructor(
+    private val requestHelper: RequestHelper,
+    private val dbHelper: DBHelper) {
+
     private var currentData: List<Team> = ArrayList()
     private val dataEmitter: PublishSubject<List<Team>> = PublishSubject.create()
     private val errorEmitter: PublishSubject<String> = PublishSubject.create()
@@ -32,6 +37,7 @@ class HomePresenter @Inject constructor(private val requestHelper: RequestHelper
                     dataEmitter.onNext(it)
                 }, {
                     loge("failed to load data", it)
+                    errorEmitter.onNext(it.localizedMessage)
                 }))
     }
 
@@ -46,27 +52,27 @@ class HomePresenter @Inject constructor(private val requestHelper: RequestHelper
     @SuppressLint("CheckResult")
     private fun saveInDb(data: List<Team>) {
         Completable.fromAction {
-            DBHelper.database.teamsDao().insertAll(data)
+            try {
+                dbHelper.getDatabase().teamsDao().insertAll(data)
+            } catch (ex: Exception) {
+                dbHelper.getDatabase().teamsDao().update(data)
+            }
         }
                 .compose(RxHelper.asyncToUiCompletable())
                 .subscribe(
                         emptyAction("Saving data list is done"),
-                        rxError("Error while removing the content from the device")
+                        rxError("Error while saving the content in the device")
                 )
     }
 
     private fun loadFromDB(): Observable<List<Team>> {
         return Observable.create {
-            it.onNext(DBHelper.database.teamsDao().getAll())
+            it.onNext(dbHelper.getDatabase().teamsDao().getAll())
         }
     }
 
     private fun requestData(): Observable<List<Team>> {
-        val uri = Uri.parse(baseURL)
-                .buildUpon()
-                .build().toString()
-
-        return requestHelper.request(uri)
+        return requestHelper.request(baseURL)
                 .map { response ->
                     val listType = object : TypeToken<List<Team>>() {}.type
                     Gson().fromJson<List<Team>>(response, listType)
