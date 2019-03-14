@@ -21,6 +21,7 @@ import io.reactivex.functions.Consumer
 import javax.inject.Inject
 import com.thescore.com.thescore.model.SortType
 import com.thescore.teamActivity.TeamActivity
+import com.thescore.utils.RxHelper
 import kotlinx.android.synthetic.main.activity_team.*
 
 class MainActivity : AppCompatActivity(), ViewHolderClicked<Team> {
@@ -73,6 +74,8 @@ class MainActivity : AppCompatActivity(), ViewHolderClicked<Team> {
 
     override fun onStop() {
         homePresenter.stop()
+        RxHelper.unsubscribe(dataDisposable.get())
+        RxHelper.unsubscribe(errorDisposable.get())
         super.onStop()
     }
 
