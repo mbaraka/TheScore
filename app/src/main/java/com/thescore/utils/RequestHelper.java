@@ -1,23 +1,21 @@
 package com.thescore.utils;
 
 import android.util.Log;
-
-
-import java.io.IOException;
-
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import javax.inject.Inject;
+import java.io.IOException;
+
 public class RequestHelper {
 	private OkHttpClient client = new OkHttpClient();
 
 	@Inject
 	public RequestHelper() {
+
 	}
 
 	public Observable<String> request(final String url) {
@@ -32,9 +30,11 @@ public class RequestHelper {
 					emitter.onError(new Exception(response.body().string()));
 				} else if (response.body() != null) {
 					emitter.onNext(response.body().string());
+					emitter.onComplete();
 				} else {
 					emitter.onError(new NullPointerException("no body from request"));
 				}
+
 			} catch (IOException | NullPointerException ex) {
 				emitter.onError(ex);
 			}

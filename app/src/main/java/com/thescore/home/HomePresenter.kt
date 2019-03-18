@@ -11,11 +11,14 @@ import com.thescore.model.Team
 import com.thescore.utils.*
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
+import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 import java.lang.Exception
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -23,15 +26,14 @@ class HomePresenter @Inject constructor(
     private val requestHelper: RequestHelper,
     private val dbHelper: DBHelper) {
 
-    private var currentData: List<Team> = ArrayList()
+    private var currentData: List<Team> = ArrayList<Team>()
     private val dataEmitter: PublishSubject<List<Team>> = PublishSubject.create()
     private val errorEmitter: PublishSubject<String> = PublishSubject.create()
 
     private val requestDisposable = SerialDisposable()
 
     fun loadData() {
-        requestDisposable.set(Observable.merge(loadFromDB(), requestData())
-                .compose(RxHelper.asyncToUiObservable())
+        requestDisposable.set(Observable.mergeDelayError(loadFromDB(), requestData())
                 .subscribe({
                     currentData = it
                     dataEmitter.onNext(it)
@@ -53,9 +55,9 @@ class HomePresenter @Inject constructor(
     private fun saveInDb(data: List<Team>) {
         Completable.fromAction {
             try {
-                dbHelper.getDatabase().teamsDao().insertAll(data)
+                dbHelper.insertTeams(data)
             } catch (ex: Exception) {
-                dbHelper.getDatabase().teamsDao().update(data)
+                dbHelper.updateTeams(data)
             }
         }
                 .compose(RxHelper.asyncToUiCompletable())
@@ -66,9 +68,7 @@ class HomePresenter @Inject constructor(
     }
 
     private fun loadFromDB(): Observable<List<Team>> {
-        return Observable.create {
-            it.onNext(dbHelper.getDatabase().teamsDao().getAll())
-        }
+        return Observable.fromCallable {dbHelper.getAllTeams()}.compose(RxHelper.asyncToUiObservable())
     }
 
     private fun requestData(): Observable<List<Team>> {
